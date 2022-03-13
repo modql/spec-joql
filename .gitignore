@@ -1,0 +1,14 @@
+# By Default ignore all .* (can make exception)
+.*
+
+# Include .gitignore
+!.gitignore
+
+# ignore node things
+node_modules/
+npm-debug.log
+
+# Ignore typical output target
+target/
+dist/
+out/
