@@ -1,13 +1,13 @@
 # Spec Repo for JSON-NQL
 
-The JSON-NQL is a Normative approach defining a set of conventions on top of JSON-RPC 2.0 to normalize remote query calls on model objects.
+The JSON-NQL is a Normative approac on top of JSON-RPC 2.0 to normalize remote query calls.
 
 At the high level, there are two types of RPC Calls
 
 - **Query Methods** - Those calls do not change the data but only return the requested datasets. This specification normalized advance filtering and inclusion schemes. 
 - **Muting Methods** - Those calls focus on changing a particular data. While it might return the data changed at some granularity, it should not include the same query capability as the first one. 
 
-This specification defines the following: 
+This specification defines the following conventions: 
 
 - **Method Names** for Query Calls (read) and Muting Calls (write).
 - **Query Call parameters** to filter, include, and order result.
@@ -61,12 +61,12 @@ Here are the normative method verbs (in the examples below, the `jsonrpc` and `i
 
 #### Query Method
 
-| verb       | meaning                                                   | example                                                       |
-|------------|-----------------------------------------------------------|---------------------------------------------------------------|
-| `get`      | Get only one item by PK id                                | `getProject` `{id: 123 }`                                     |
-| `list`     | List cases based on some                                  | `listProject` `{"filters": {title:  {$startsWith = "cool"} }` |
-| `first`    | Params like list, return like get (null if nothing found) | `first` `{"filters": {title:  "title 1" }`                    |
-| `[custom]` | Domain specific                                           | `lookupProject`                                               |
+| verb       | meaning                                                                 | example                                                       |
+|------------|-------------------------------------------------------------------------|---------------------------------------------------------------|
+| `get`      | Get only one item by PK id (error if not found/no access)               | `getProject` `{id: 123 }`                                     |
+| `list`     | List cases based on some (`result.data` always array)                   | `listProject` `{"filters": {title:  {$startsWith = "cool"} }` |
+| `first`    | Params like list, return like get (`result.data` null if nothing found) | `first` `{"filters": {title:  "title 1" }`                    |
+| `[custom]` | Domain specific                                                         | `lookupProject`                                               |
 
 Note - `get` params is fixed, and if another way is needed to get an entity, for example, get user by username, another `getUserByUsername` `{username: "..."}` should be implemented.
 
@@ -77,6 +77,27 @@ A query call is typically done on a main model entity implied from their method 
 - `$filters` - Express the criteria to be matched on the main entity and its relations.
 - `$includes` - Express what needs to be returned with the main entity. 
 - `$pagination`, `$orderby` - other optional query attributes.
+
+## $includes
+
+`$includes` is a way to specify what needs to be included in the response. 
+
+- The simplest way is to have `$includes: {propertyName: true}` which will include the property name in the response. 
+- When the `propertyName` value is an object, then doing `$includes: {propertyName: true}` will include the default property of this entity model (.e.g, `id`, `name`)
+- When the `propertyName` value is an object, we can become more precise. For example, for a `listProjects` methods, `$includes` could look like:
+
+```ts
+$includes: {
+    projects: {
+        // will include the default properties of each Project (same as $includes.projects: true)
+        _defaults: true,
+        // will includes the timestamps cid, ctime, mid, mtime
+        _timestamps: true,
+        // include description part of the return
+        description: true
+    }
+}
+```
 
 
 ## Query Calls Example
@@ -92,12 +113,6 @@ For example, list projects given some filters and specifying what to include.
     jsonrpc: "2.0",
     method: "listProjects",
     params: {
-        $paginnation: { 
-            ...
-        }, 
-
-        $orderBy: ["!ctime"],
-
         // narrow the targeted entity result set 
         $filters: { 
             name: {$contains: "safari"}
@@ -123,6 +138,12 @@ For example, list projects given some filters and specifying what to include.
 
             owner: {id: false, fullName: true, username: true}
          }, 
+         
+        $paginnation: { 
+            ...
+        }, 
+
+        $orderBy: ["!ctime"],         
     },
     id: null
 }
@@ -319,14 +340,19 @@ Any code within this range but not defined explicitly below is reserved for futu
 
 The following scheme can be followed and extended per application for application-specific errors. 
 
-| code      | message (enum style) | meaning                                             |
-|-----------|----------------------|-----------------------------------------------------|
-| 1000-1099 | AUTH_...             | Authentication error (missing header, expired, ...) |
-| 1100-1199 | ACCESS_...           | Access/Privileges Errors                            |
-| 3000-...  | ..._....             | Other Application Errors                            |
-| 5000-...  | METHOD_NAME_....     | By method errors                                    |
+| code      | message (enum style) | meaning                                                                                 |
+|-----------|----------------------|-----------------------------------------------------------------------------------------|
+| 1000-1099 | AUTH_...             | Authentication error (missing header, expired, ...)                                     |
+| 1100-1199 | ACCESS_...           | Access/Privileges Errors                                                                |
+| 3000-...  | ..._....             | Other Application Errors                                                                |
+| 5000      | INVALID_METHOD_NAME  | Invalid method name                                                                     |
+| 5010      | INVALID_PARAMS       | Invalid params for the method name (list of error are in errors.data: {desc: string}[]) |
 
 ## Key data types
 
 - All date/time will be of type string with the format **ISO 8601** `YYYY-MM-DDTHH:mm:ss.sssZ`
 
+
+## License
+
+MIT & Apache v2.0
