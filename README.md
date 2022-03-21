@@ -149,35 +149,42 @@ For example, list projects given some filters and specifying what to include.
 }
 ```
 
-The json-rpc `.result.data` will look like this
+The json-rpc response will look like this
 
 ```js
 {
-    paginnation: {
-        fromPageToken: string
-        nextPageToken: string
+    // REQUIRED and must be exactly "2.0"
+    jsonrpc: "2.0", 
+    result: {
+        data: [
+            // project entity
+            { 
+                name: "Safari Update Project", 
+                tickets: [
+                    {
+                        title: "This is an important ticket",
+                        cid: ...,
+                        ctime: ..., 
+                        cid: ...,
+                        mtime: ...,
+                        labels: [{name: "..."}, {name: "..."}]
+                    },
+
+                ],
+                owner: {....}
+            },
+            // project entity
+            { ... }
+        ],
+        // advanced, when pagination is supported
+        paginnation: {
+            fromPageToken: string
+            nextPageToken: string
+        },        
     },
 
-    data: [
-        // project entity
-        { 
-            name: "Safari Update Project", 
-            tickets: [
-                {
-                    title: "This is an important ticket",
-                    cid: ...,
-                    ctime: ..., 
-                    cid: ...,
-                    mtime: ...,
-                    labels: [{name: "..."}, {name: "..."}]
-                },
-
-            ],
-            owner: {....}
-        },
-        // project entity
-        { ... }
-    ]
+    id: "id from request"
+    
 }
 
 ```
