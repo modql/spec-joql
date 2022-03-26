@@ -2,6 +2,19 @@
 Spec: https://www.jsonrpc.org/specification
 
 
+## Why JSON-RPC 2.0 over REST?
+
+TLDR; As simple as REST but **function centric** & **protocol agnostic** (v.s. resource centric & http based)
+
+- **As simple as REST** - From a http protocol point of view, JSON-RPC is a subset of REST, only POST and JSON, and while it might be a little unfamiliar at first, the medium/long-term benefits are significant.
+- **Functions Centric** - Sementically match well function calls. Do not need to contort API Calls to HTTP resource centric (e.g. GET v.s. POST v.s. PUT v.s. PATCH, and Path v.s. Params v.s. Body). 
+- **Transport Protocol Agnostic** Supports HTTP as simple as REST, but JSON-RPC is a transport agnostic message-based protocol decoupled from the conduit. It can be used with other conduit schemes of data/command exchange, pub/sub, web socket, inter-process, etc.
+- **Simpler to Type/Verify** - Since everything is JSON Body, simpler to type and verify (e.g., JSON Schema)
+- **Support for batch** - Inherently support batching of queries. 
+
+See here the [JSON RPC Quick Intro](json-rpc-intro.md) ([Official json-rpc spec](https://www.jsonrpc.org/specification))
+
+
 ### Request format
 
 (in js for readability, but MUST be 100% standard JSON, no comments)
@@ -50,7 +63,7 @@ _Returned by the service_
 
         // (optional) Service/Method dependent extra information
         data: {}
-    }
+    },
 
     // REQUIRED (will match the corresponding json-rpc request)
     id: "some_client_id_per_request", 
