@@ -4,9 +4,13 @@
 # Include .gitignore
 !.gitignore
 
+# ignore ssite site dist
+_site/
+
 # ignore node things
 node_modules/
 npm-debug.log
+
 
 # Ignore typical output target
 target/

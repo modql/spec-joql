@@ -1,8 +1,8 @@
-# JNQL (Json Normalized Query Language) Spec
+# JOQL (Json Oriented Query Language) Spec
 
-The JNQL is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
+JOQL is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
 
-JNQL defines the following conventions: 
+JOQL defines the following conventions: 
 
 - **Method Names** for Query Calls (read) and Muting Calls (write).
 - **Query Call parameters** to filter, include, and order result.
@@ -291,22 +291,22 @@ interface TicketUpdate {
 
 Filters and Includes allow to express conditional rules base on a `{property: {operator: value}}` scheme. The following table shows the list of possible operators.
 
-| Operator        | Meaning                                         | Example                                    |
-|-----------------|-------------------------------------------------|--------------------------------------------|
-| `$eq`           | Exact match with one value                      | `{name: {"$eq": "Jon Doe"}}`               |
-| `$notEq`        | Exclude any exact match                         | `{name: {"$notEq": "Jon Doe"}}`            |
-| `$in`           | Exact match with within a list of values (or)   | `{name: {"$in": ["Alice", "Jon Doe"]}}`    |
-| `$notIn`        | Exclude any exact withing a list                | `{name: {"$notIn": ["Jon Doe"]}}`          |
-| `$contains`     | For string, does a contains                     | `{name: {"$contains": "Doe"}}`             |
-| `$containsIn`   | For string, match if contained in any of items  | `{name: {"$containsIn": ["Doe", "Ali"]}}`  |
-| `$startsWith`   | For string, does a startsWith                   | `{name: {"$startsWith": "Jon"}}`           |
-| `$startsWithIn` | For string, match if startsWith in any of items | `{name: {"$startsWithIn": ["Jon", "Al"]}}` |
-| `$endsWith`     | For string, does and end with                   | `{name: {"$endsWithIn": "Doe"}}`           |
-| `$endsWithIn`   | For string, does a contains  (or)               | `{name: {"$endsWithIn": ["Doe", "ice"]}}`  |
-| `$lt`           | Lesser Than                                     | `{age: {"$lt": 30}}`                       |
-| `$lte`          | Lesser Than or =                                | `{age: {"$lte": 30}}`                      |
-| `$gt`           | Greater Than                                    | `{age: {"$gt": 30}}`                       |
-| `$gte`          | Greater Than or =                               | `{age: {"$gte": 30}}`                      |
+| Operator        | Meaning                                         | Example                                                  |
+|-----------------|-------------------------------------------------|----------------------------------------------------------|
+| `$eq`           | Exact match with one value                      | `{name: {"$eq": "Jon Doe"}}` same as `{name: "Jon Doe"}` |
+| `$notEq`        | Exclude any exact match                         | `{name: {"$notEq": "Jon Doe"}}`                          |
+| `$in`           | Exact match with within a list of values (or)   | `{name: {"$in": ["Alice", "Jon Doe"]}}`                  |
+| `$notIn`        | Exclude any exact withing a list                | `{name: {"$notIn": ["Jon Doe"]}}`                        |
+| `$contains`     | For string, does a contains                     | `{name: {"$contains": "Doe"}}`                           |
+| `$containsIn`   | For string, match if contained in any of items  | `{name: {"$containsIn": ["Doe", "Ali"]}}`                |
+| `$startsWith`   | For string, does a startsWith                   | `{name: {"$startsWith": "Jon"}}`                         |
+| `$startsWithIn` | For string, match if startsWith in any of items | `{name: {"$startsWithIn": ["Jon", "Al"]}}`               |
+| `$endsWith`     | For string, does and end with                   | `{name: {"$endsWithIn": "Doe"}}`                         |
+| `$endsWithIn`   | For string, does a contains  (or)               | `{name: {"$endsWithIn": ["Doe", "ice"]}}`                |
+| `$lt`           | Lesser Than                                     | `{age: {"$lt": 30}}`                                     |
+| `$lte`          | Lesser Than or =                                | `{age: {"$lte": 30}}`                                    |
+| `$gt`           | Greater Than                                    | `{age: {"$gt": 30}}`                                     |
+| `$gte`          | Greater Than or =                               | `{age: {"$gte": 30}}`                                    |
 
 The operator sub-parts can be described as below: 
 - `not` is a **prefix** when we want to express the negation of another operator. camelCase follows the `not` prefix. 
@@ -333,12 +333,12 @@ Any code within this range but not defined explicitly below is reserved for futu
 | -32500 | SERVICE_ERROR                | An unknown service/application error (should try to avoid)    |
 
 
-### JNQL Specific errors
+### JOQL Specific errors
 
 | code  | message (enum style)      | meaning                                                                                                                        |
 |-------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| -2000 | JNQL_PARAMS_NOT_OBJECT    | In JNQL `params` must but be an object (cannot be an array)                                                                    |
-| -2001 | JNQL_PARAMS_QUERY_INVALID | For Query calls only `$includes` `$filters` and `$pagination` and `$orderBy` are allowed for now (this can be extended by app) |
+| -2000 | JOQL_PARAMS_NOT_OBJECT    | In JOQL `params` must but be an object (cannot be an array)                                                                    |
+| -2001 | JOQL_PARAMS_QUERY_INVALID | For Query calls only `$includes` `$filters` and `$pagination` and `$orderBy` are allowed for now (this can be extended by app) |
 
 
 ### Application errors
