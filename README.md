@@ -321,16 +321,16 @@ Any code within this range but not defined explicitly below is reserved for futu
 
 
 ### JSON-RPC erros
-| code   | message (enum style)         | meaning                                                       |
-|--------|------------------------------|---------------------------------------------------------------|
-| -32700 | PARSE_NOT_VALID_JSON         | Not a valid JSON                                              |
-| -32701 | PARSE_UNSUPPORTED_ENCODING   | parse error. unsupported encoding                             |
-| -32702 | PARSE_INVALID_CHAR_ENCONDING | parse error. invalid character for encoding                   |
-| -32600 | INVALID_JSON_RPC_FORMAT      | The JSON sent is not a valid Request object.                  |
-| -32601 | JSON_RPC_METHOD_NOT_FOUND    | The method does not exist / is not available.                 |
-| -32602 | JSON_RPC_PARAMS_INVALID      | The params is an invalid json-rpc (should be object or array) |
-| -32603 | JSON_RPC_INTERNAL_ERROR      | Another json-rpc error happened not captured above            |
-| -32500 | SERVICE_ERROR                | An unknown service/application error (should try to avoid)    |
+| code   | message (enum style)         | meaning                                                                                   |
+|--------|------------------------------|-------------------------------------------------------------------------------------------|
+| -32700 | PARSE_NOT_VALID_JSON         | Not a valid JSON                                                                          |
+| -32701 | PARSE_UNSUPPORTED_ENCODING   | parse error. unsupported encoding                                                         |
+| -32702 | PARSE_INVALID_CHAR_ENCONDING | parse error. invalid character for encoding                                               |
+| -32600 | JSON_RPC_INVALID_FORMAT      | The JSON sent is not a valid Request object (no `id` or missing/invalid `jsonrpc` value). |
+| -32601 | JSON_RPC_METHOD_NOT_FOUND    | The method does not exist / is not available.                                             |
+| -32602 | JSON_RPC_PARAMS_INVALID      | The params is an invalid json-rpc (should be object or array)                             |
+| -32603 | JSON_RPC_INTERNAL_ERROR      | Another json-rpc error happened not captured above                                        |
+| -32500 | SERVICE_ERROR                | An unknown service/application error (should try to avoid)                                |
 
 
 ### JOQL Specific errors
