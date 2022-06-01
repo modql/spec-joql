@@ -1,4 +1,6 @@
-# JOQL (Json Oriented Query Language) Spec
+<h1 class="title">JOQL<br />
+    <small><b>J</b>son <b>O</b>riented <b>Q</b>uery <b>L</b>anguage</small>
+</h1>
 
 JOQL is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
 
@@ -10,11 +12,15 @@ JOQL defines the following conventions:
 - **Response result** data format based on Query and Muting calls.
 - **Response error** format based on JSON-RPC 2.0 base error codes and application extension scheme. 
 
+JOQL follows the **ModQL** (Model Query Language) scheme, described below as `$includes`, `$filters`, `$orderBy`, `$limit`, `$offset`. 
+
+[GitHub: modql/joql-spec](https://github.com/modql/joql-spec)
+
 ## Method Names
 
 At the high level, there are two types of RPC Calls
 
-- **Query Methods** - Those calls do not change the data but only return the requested datasets. This specification normalized advance filtering and inclusion schemes. 
+- **Query Methods** - Those calls do not change the data but only return the requested datasets. This specification normalized advanced filtering and inclusion schemes. 
 - **Muting Methods** - Those calls focus on changing a particular data. While it might return the data changed at some granularity, it should not include the same query capability as the first one. 
 
 All JSON-RPC methods will be structured with the following format `[verb][EntityModel][OptionalSuffix]`.
@@ -51,15 +57,18 @@ Here are the normative method verbs (in the examples below, the `jsonrpc` and `i
 | `first`    | Params like list, return like get (`result.data` null if nothing found)                                      | `first` with params: `{"$filters": {title:  "title 1" }`                                                  |
 | `[custom]` | Domain specific verb                                                                                         | `listLiveProjects` (e.g., return projects that are beeing edited or worked at this specific request time) |
 
-Note - `get...` methods' params are fixed for their PK only. If another way is needed to get an entity, for example, get user by username, another `getUserByUsername` methods with params `{username: "..."}` should be exposed.
+Note - `get...` methods' params are fixed for their PK only. If another way is needed to get an entity, for example, get user by username, another `getUserByUsername` method with params `{username: "..."}` should be exposed.
 
 ## Query Call Structure
 
-A query call is typically done on a main model entity implied from their method name (e.g., `listProjects`, `listTodos`). 
+A query call is typically done on the top model entity implied from their method name (e.g., `listProjects`, `listTodos`).
 
-- `$includes` - Query methods might allow to specified what should be returned in the response relatively to the query main entity. This is done with the `params` property `$includes`. 
-- `$filters` - Query such as `list...` and `...first` should allow a way to filters what need to be returned, and this is expressed with the `params` property `$fileters`. 
-- `$pagination`, `$orderby` - For more advanced query apis, other top level `params` properties such as `$pagination` and `orderBy` can be provided. 
+- `$includes` - Query methods might allow specifying what should be returned in the response relative to the main query entity. This is done with the `params` property `$includes`. 
+- `$filters` - Query such as `list...` and `...first` should allow a way to filter what needs to be returned, which is expressed with the `params` property `$fileters`. 
+- `$orderBy` - Allows ordering the list of entities by some of its properties. Using a property name like `"title"` will order ascending, and prefixing it with `!` will make it descending.
+- `$limit` - Limit the number of entities being returned (only apply to the top-level entities)
+- `$offset` - Skip that many entities before beginning to return the entity list.
+
 
 ### $includes
 
@@ -67,7 +76,7 @@ A query call is typically done on a main model entity implied from their method 
 
 - The simplest way is to have `$includes: {propertyName: true}` which will include the property name in the response. 
 - When the `propertyName` value is an object, then doing `$includes: {propertyName: true}` will include the default property of this entity model (.e.g, `id`, `name`)
-- When the `propertyName` value is an object, we can become more precise. For example, for a `listProjects` methods, `$includes` could look like:
+- When the `propertyName` value is an object, we can become more precise. For example, for a `listProjects` method, `$includes` could look like:
 
 ```ts
 $includes: {
@@ -114,6 +123,8 @@ For example, list projects given some filters and specifying what to include.
                 // default to give only "label.name" in this case. can do {timestamp: true, color: true}
                 labels: true, 
 
+
+                // Advanced sub filtering (might be omitted by implementation)
                 $orderBy: ["!ctime"],
                 
                 $filters: {
@@ -122,13 +133,8 @@ For example, list projects given some filters and specifying what to include.
             }, 
 
             owner: {id: false, fullName: true, username: true}
-         }, 
-         
-        $paginnation: { 
-            ...
-        }, 
-
-        $orderBy: ["!ctime"],         
+         },          
+        $orderBy: "!ctime",         
     },
     id: null
 }
@@ -162,10 +168,8 @@ The json-rpc response will look like this
             { ... }
         ],
         // advanced, when pagination is supported
-        paginnation: {
-            fromPageToken: string
-            nextPageToken: string
-        },        
+        $orderBy: "!mtime", // order by modification time descendant (most recent first)
+        $limit: 100, // only get the 100 most recent
     },
 
     id: "id from request"
@@ -248,7 +252,10 @@ Now, to create a ticket for this project (let's say that this projectId is `123`
         sendNotification: true, // just example of top level
         data: { // TicketCreate
             projectId: number,
-            title: "My first ticket"
+            title: "My first ticket",
+            attributes_add: { // assuming ticket have a "attributes" jsonb like property and need to add a key/value to it
+                "some_attribute_name": "Some value"
+            }
         }
     },
     id: null    
@@ -294,7 +301,7 @@ Filters and Includes allow to express conditional rules base on a `{property: {o
 | Operator        | Meaning                                         | Example                                                  |
 |-----------------|-------------------------------------------------|----------------------------------------------------------|
 | `$eq`           | Exact match with one value                      | `{name: {"$eq": "Jon Doe"}}` same as `{name: "Jon Doe"}` |
-| `$notEq`        | Exclude any exact match                         | `{name: {"$notEq": "Jon Doe"}}`                          |
+| `$not`          | Exclude any exact match                         | `{name: {"$not": "Jon Doe"}}`                            |
 | `$in`           | Exact match with within a list of values (or)   | `{name: {"$in": ["Alice", "Jon Doe"]}}`                  |
 | `$notIn`        | Exclude any exact withing a list                | `{name: {"$notIn": ["Jon Doe"]}}`                        |
 | `$contains`     | For string, does a contains                     | `{name: {"$contains": "Doe"}}`                           |
@@ -358,4 +365,6 @@ Any code within this range but not defined explicitly below is reserved for futu
 
 ## License
 
-MIT & Apache v2.0
+Apache-2.0 OR MIT
+
+Copyright (c) 2022 BriteSnow, Inc
