@@ -315,6 +315,13 @@ Filters and Includes allow to express conditional rules base on a `{property: {o
 | `$gt`           | Greater Than                                    | `{age: {"$gt": 30}}`                                     |
 | `$gte`          | Greater Than or =                               | `{age: {"$gte": 30}}`                                    |
 
+For scalar array types
+
+| Operator | Meaning                                                    | Example                                |
+|----------|------------------------------------------------------------|----------------------------------------|
+| `$has`   | Matching if value has at list all items (can have more)    | `{tags: {"$has": ["P1", "Feature"]} }` |
+| `= "P1"` | Matching one item. Short hand for `tags: {"$has": ["P1"]}` | `{tags: "P1"}`                         |
+
 The operator sub-parts can be described as below: 
 - `not` is a **prefix** when we want to express the negation of another operator. camelCase follows the `not` prefix. 
 - `in` is a **suffix** when an operator can take a list of items. It means it will succeed if one of the item match.
