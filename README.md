@@ -293,7 +293,6 @@ interface TicketUpdate {
 ```
 
 
-
 ## Conditional Operators
 
 Filters and Includes allow to express conditional rules base on a `{property: {operator: value}}` scheme. The following table shows the list of possible operators.
@@ -314,6 +313,7 @@ Filters and Includes allow to express conditional rules base on a `{property: {o
 | `$lte`          | Lesser Than or =                                | `{age: {"$lte": 30}}`                                    |
 | `$gt`           | Greater Than                                    | `{age: {"$gt": 30}}`                                     |
 | `$gte`          | Greater Than or =                               | `{age: {"$gte": 30}}`                                    |
+| `$empty`        | If the value is empty (null or "" or {} or [])  | `{name: {"$empty": true}}`                               |
 
 For scalar array types
 
