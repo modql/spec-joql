@@ -3,7 +3,7 @@
 <h2 class="title"><small><b>J</b>son <b>O</b>riented <b>Q</b>uery <b>L</b>anguage</small></h2>
 </header>
 
-**JOQL** is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
+**JOQL** is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro)).
 
 **JOQL** defines the following conventions: 
 

@@ -1,6 +1,8 @@
+[Back Home](/)
 
-Spec: https://www.jsonrpc.org/specification
+## JSON-RPC 2.0 Official Spec
 
+https://www.jsonrpc.org/specification
 
 ## Why JSON-RPC 2.0 over REST?
 
