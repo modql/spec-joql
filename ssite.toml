@@ -1,0 +1,13 @@
+[source]
+content_dir = "./"
+dist_dir = "_site"
+includes = [ # NOT SUPPORTED YET
+  "*.md",
+  "**/*.css"
+]
+
+[runner.webdev]
+run_on = ["Dev"]
+cwd = "./_site"
+cmd = "webdev"
+args = ["-l", "--public"]

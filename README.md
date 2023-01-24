@@ -1,10 +1,11 @@
-<h1 class="title">JOQL<br />
-    <small><b>J</b>son <b>O</b>riented <b>Q</b>uery <b>L</b>anguage</small>
-</h1>
+<header>
+<h1 class="title">JOQL</h1>
+<h2 class="title"><small><b>J</b>son <b>O</b>riented <b>Q</b>uery <b>L</b>anguage</small></h2>
+</header>
 
-JOQL is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
+**JOQL** is a Normative approach on top of JSON-RPC 2.0 to further define remote query calls. (see [json-rpc quick intro](json-rpc-intro.html)).
 
-JOQL defines the following conventions: 
+**JOQL** defines the following conventions: 
 
 - **Method Names** for Query Calls (read) and Muting Calls (write).
 - **Query Call parameters** to filter, include, and order result.
@@ -319,7 +320,9 @@ Filters and Includes allow to express conditional rules base on a `{property: {o
 | `$lte`             | Lesser Than or =                                | `{age: {"$lte": 30}}`                                    |
 | `$gt`              | Greater Than                                    | `{age: {"$gt": 30}}`                                     |
 | `$gte`             | Greater Than or =                               | `{age: {"$gte": 30}}`                                    |
+| `$wild`            | Allows for wild card query                      | `{name: {"$wild": "AA*BB*CC"}}`                          |
 | `$empty`           | If the value is empty (null or "" or {} or [])  | `{name: {"$empty": true}}`                               |
+
 
 For scalar array types
 
@@ -340,7 +343,8 @@ The error codes from and including -32768 to -32000 are reserved for pre-defined
 Any code within this range but not defined explicitly below is reserved for future use. The error codes are nearly the same as those suggested for XML-RPC at the following url: http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
 
 
-### JSON-RPC erros
+### JSON-RPC errors
+
 | code   | message (enum style)         | meaning                                                                                   |
 |--------|------------------------------|-------------------------------------------------------------------------------------------|
 | -32700 | PARSE_NOT_VALID_JSON         | Not a valid JSON                                                                          |
@@ -378,6 +382,6 @@ Any code within this range but not defined explicitly below is reserved for futu
 
 ## License
 
-Apache-2.0 OR MIT
+[Apache-2.0](LICENSE-APACHE) OR [MIT](LICENSE-MIT)
 
-Copyright (c) 2022 BriteSnow, Inc
+Copyright (c) 2023 BriteSnow, Inc

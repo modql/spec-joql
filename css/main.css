@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+html {
+	font-size: 16px;
+}
+
+body {
+	font-family: "Open Sans";
+	max-width: 1000px;
+	line-height: 1.5;
+	margin: 2rem auto 2rem auto;
+}
+
+header {
+	margin: 0 0 3rem 0;
+}
+
+h1.title,
+h2.title {
+	text-decoration: none;
+	text-align: center;
+	margin: 0;
+}
+
+h1.title {
+	font-size: 3.5rem;
+	font-weight: 600;
+	color: #424242;
+}
+
+h2.title small {
+	font-size: 2.5rem;
+	color: #626262;
+	font-weight: 100;
+}
+
+h2.title small b {
+	font-weight: 600;
+	color: #626262;
+}
+
+code {
+	font-family: 'Source Code Pro';
+	font-weight: 500;
+}
+
+code:not(.hljs) {
+	color: rgb(189, 98, 0) !important;
+}
+
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: .5rem 1rem;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
