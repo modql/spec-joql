@@ -71,28 +71,67 @@ A query call is typically done on the top model entity implied from their method
 - `$offset` - Skip that many entities before beginning to return the entity list.
 
 
-### $includes
+### `$includes`
 
 `$includes` is a way to specify what needs to be included in the response. 
 
 - The simplest way is to have `$includes: {propertyName: true}` which will include the property name in the response. 
-- When the `propertyName` value is an object, then doing `$includes: {propertyName: true}` will include the default property of this entity model (.e.g, `id`, `name`)
+- When the `propertyName` value is an object, then doing `$includes: {propertyName: true}` will include the default properties of this entity model (typically `id`, `name`)
+- By convention, `$include` keys started with `_` represents a group of properties. For example `_defaults` represents the default properties of the entity. In other words, `_...` are shortcut group properties to not have to specify them one by one. Those are application specifics. 
 - When the `propertyName` value is an object, we can become more precise. For example, for a `listProjects` method, `$includes` could look like:
 
 ```ts
 $includes: {
-    projects: {
-        // will include the default properties of each Project (same as $includes.projects: true)
-        _defaults: true,
-        // will includes the timestamps cid, ctime, mid, mtime
-        _timestamps: true,
-        // include description part of the return
-        description: true
-    }
+    // will include the default properties of each Project (same as $includes.projects: true)
+    _defaults: true,
+    // will includes the timestamps cid, ctime, mid, mtime
+    _timestamps: true,
+
+    // include description part of the return
+    description: true,
+
+    tickets: { // include the related tickets
+      _defaults: true, // this may include .id and .title
+      description: true, // this will add .description
+    }, 
+
+    workspace: true, // can even include container if the model layer allows it. 
 }
 ```
 
-### $filters
+### `$filters`
+
+The `$filters` main params property allows to specify filters to be apply to the query call. 
+
+For example, the following request will list all of the projects for which title contains 'safari'
+
+- Filter property, can be exact match, such as `title: "safari"` in this case it will exact match. 
+- Or can have one or more [Conditional Operators](#conditional-operators) commands like `title: {"$contains": "safari", "startsWith": "compat"}` which will match only tickets that have their title match
+
+
+```js
+{
+    jsonrpc: "2.0",
+    method: "listTickets",
+    params: {
+        // narrow the targeted entity result set 
+        $filters: { 
+            projectId: 123,
+            // return tickets where .name contains 'safari'
+            name: {$contains: "safari"}
+        }, 
+
+        // define what to return for what has been matched by a targeted entity
+        $includes: { 
+            "id": true, // returns the ticket.id
+            "title": true, // returns the ticket.name
+         },          
+        $orderBy: "!ctime",         
+    },
+    id: null
+}
+```
+
 
 
 ## Query Calls Example
@@ -110,11 +149,14 @@ For example, list projects given some filters and specifying what to include.
     params: {
         // narrow the targeted entity result set 
         $filters: { 
+            // return projects where .name contains 'safari'
             name: {$contains: "safari"}
         }, 
 
         // define what to return for what has been matched by a targeted entity
         $includes: { 
+            "id": true, // returns the project.id
+            "name": true, // returns the project.name
 
             // will include tickets (joined entity), with the following property for each item
             tickets: { 
@@ -123,7 +165,6 @@ For example, list projects given some filters and specifying what to include.
 
                 // default to give only "label.name" in this case. can do {timestamp: true, color: true}
                 labels: true, 
-
 
                 // Advanced sub filtering (might be omitted by implementation)
                 $orderBy: ["!ctime"],
@@ -141,7 +182,7 @@ For example, list projects given some filters and specifying what to include.
 }
 ```
 
-The json-rpc response will look like this
+The json-rpc response will look like this:
 
 ```js
 {
@@ -176,8 +217,10 @@ The json-rpc response will look like this
     id: "id from request"
     
 }
-
 ```
+
+> Note - The requested data, here the list of projects, is always returned in the `result.data` property. 
+> This allows to have other top level property down the road, such as `result.meta` to get `pagination` token or such meta data. 
 
 ## Muting Call Example
 
@@ -296,7 +339,9 @@ interface TicketUpdate {
 
 ## Conditional Operators
 
-Filters and Includes allow to express conditional rules base on a `{property: {operator: value}}` scheme. The following table shows the list of possible operators.
+Filters and Includes allow to express conditional rules base on a `{property: {operator1: value1, operator2: value2}}` scheme. The following table shows the list of possible operators.
+
+### String Operators
 
 | Operator           | Meaning                                         | Example                                                  |
 |--------------------|-------------------------------------------------|----------------------------------------------------------|
@@ -316,22 +361,45 @@ Filters and Includes allow to express conditional rules base on a `{property: {o
 | `$notEndsWith`     | Does not end with                               | `{name: {"$notEndsWithIn": "Doe"}}`                      |
 | `$endsWithIn`      | For string, does a contains  (or)               | `{name: {"$endsWithIn": ["Doe", "ice"]}}`                |
 | `$notEndsWithIn`   | Does not end with any of the items              | `{name: {"$notEndsWithIn": ["Doe", "ice"]}}`             |
-| `$lt`              | Lesser Than                                     | `{age: {"$lt": 30}}`                                     |
-| `$lte`             | Lesser Than or =                                | `{age: {"$lte": 30}}`                                    |
-| `$gt`              | Greater Than                                    | `{age: {"$gt": 30}}`                                     |
-| `$gte`             | Greater Than or =                               | `{age: {"$gte": 30}}`                                    |
+| `$lt`              | Lesser Than                                     | `{age: {"$lt": "Z"}}`                                    |
+| `$lte`             | Lesser Than or =                                | `{age: {"$lte": "Z"}}`                                   |
+| `$gt`              | Greater Than                                    | `{age: {"$gt": "A"}}`                                    |
+| `$gte`             | Greater Than or =                               | `{age: {"$gte": "A"}}`                                   |
 | `$wild`            | Allows for wild card query                      | `{name: {"$wild": "AA*BB*CC"}}`                          |
 | `$empty`           | If the value is empty (null or "" or {} or [])  | `{name: {"$empty": true}}`                               |
 
+### Number Operators
 
-For scalar array types
+| Operator | Meaning                                       | Example                                  |
+|----------|-----------------------------------------------|------------------------------------------|
+| `$eq`    | Exact match with one value                    | `{age: {"$eq": 24}}` same as `{age: 24}` |
+| `$not`   | Exclude any exact match                       | `{age: {"$not": 24}}`                    |
+| `$in`    | Exact match with within a list of values (or) | `{age: {"$in": [23, 24]}}`               |
+| `$notIn` | Exclude any exact withing a list              | `{age: {"$notIn": [24]}}`                |
+| `$lt`    | Lesser Than                                   | `{age: {"$lt": 30}}`                     |
+| `$lte`   | Lesser Than or =                              | `{age: {"$lte": 30}}`                    |
+| `$gt`    | Greater Than                                  | `{age: {"$gt": 30}}`                     |
+| `$gte`   | Greater Than or =                             | `{age: {"$gte": 30}}`                    |
 
-| Operator | Meaning                                                    | Example                                |
-|----------|------------------------------------------------------------|----------------------------------------|
-| `$has`   | Matching if value has at list all items (can have more)    | `{tags: {"$has": ["P1", "Feature"]} }` |
-| `= "P1"` | Matching one item. Short hand for `tags: {"$has": ["P1"]}` | `{tags: "P1"}`                         |
+### Boolean Operators
+
+| Operator | Meaning                    | Example                                      |
+|----------|----------------------------|----------------------------------------------|
+| `$eq`    | Exact match with one value | `{dev: {"$eq": true}}` same as `{dev: true}` |
+| `$not`   | Exclude any exact match    | `{dev: {"$not": false}}`                     |
+
+
+### String Array Operators
+
+| Operator              | Meaning                                          | Example                                |
+|-----------------------|--------------------------------------------------|----------------------------------------|
+| `String Operators...` | All String Operators applying to one of the item | `{tags: "P1"}`                         |
+| `$has`                | Matching if value has all of the items           | `{tags: {"$has": ["P1", "Feature"]} }` |
+
+### Naming convention
 
 The operator sub-parts can be described as below: 
+
 - `not` is a **prefix** when we want to express the negation of another operator. camelCase follows the `not` prefix. 
 - `in` is a **suffix** when an operator can take a list of items. It means it will succeed if one of the item match.
 
